@@ -1,0 +1,43 @@
+- domain
+- email address
+- full email (friendly name + address)
+- by date
+- write to mongo
+
+json design:
+
+collections:
+
+    user
+        user_id, email, last_uid, last_update_date
+    email
+        domain
+        address
+        friendly_name
+        full_email
+        uid
+        date
+        user_id
+
+        index on user_id
+
+        import "labix.org/v2/mgo"
+
+
+go server
+
+    update_user
+        read last uid, get all msgs
+        write each to db
+
+    get_user
+        get count by email address with uids
+
+code breakdown
+
+    main
+        build webserver
+    data
+        communicate with mongo
+    email
+        communicate with imap
