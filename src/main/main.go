@@ -2,40 +2,9 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"time"
+	//"fmt"
+	"inbox"
 )
-
-type Inbox struct {
-	Senders map[string]*Sender
-}
-
-type Sender struct {
-	Count int
-	Ids   []uint32
-}
-
-type EmailData struct {
-	Domain  string
-	Address string
-	Name    string
-	Uid     uint32
-	Date    time.Time
-	Size    uint32
-	User_Id int
-}
-
-type EmailDataWriter interface {
-	WriteEmailData(ed EmailData)
-}
-
-type TerminalEmailDataWriter struct {
-	test bool
-}
-
-func (tedw *TerminalEmailDataWriter) WriteEmailData(ed EmailData) {
-	fmt.Printf("%s,%s,%s,%d,%s,%d\n", ed.Domain, ed.Address, ed.Name, ed.Uid, ed.Date.Format("2006-01-02"), ed.Size)
-}
 
 func main() {
 	var (
@@ -51,8 +20,19 @@ func main() {
 	flag.IntVar(&user_id, "user_id", 0, "mongo user_id")
 	flag.Parse()
 
-	e := NewEmail(server, user, pw, user_id)
-	//edw := new(TerminalEmailDataWriter)
-	edw := NewMongoEmailDataWriter()
-	e.GetCounts(1, edw)
+	//e := inbox.NewEmail(server, user, pw, user_id)
+	//e.GetCounts(1, ed)
+	//edw := inbox.TerminalEmailDataWriter(true)
+	ed := inbox.NewMongoEmailData("localhost", "inbox")
+
+	ed.GetEmailData(user_id, "domain")
+	/*results, err := ed.GetEmailData(user_id, "domain")
+	if err != nil {
+		panic(err)
+	}
+
+	for _, result := range results {
+		fmt.Println(result)
+	}
+	*/
 }

@@ -1,10 +1,9 @@
-package main
+package inbox
 
 import (
 	"crypto/tls"
 	"fmt"
 	"github.com/sbinet/go-imap/go1/imap"
-	//"os"
 )
 
 type Email struct {
@@ -79,11 +78,6 @@ func (e *Email) getCountsOneLoop(minUid uint32, edw EmailDataWriter) (lastUid ui
 	for _, resp := range cmd.Data {
 		ed, _ := e.ParseFetchResp(resp)
 		edw.WriteEmailData(ed)
-		/* FIXME test
-		   if i > 10 {
-		       os.Exit(1)
-		   }
-		*/
 		lastUid = ed.Uid
 	}
 

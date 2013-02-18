@@ -4,34 +4,29 @@
 - by date
 - write to mongo
 
+import "labix.org/v2/mgo"
+
 json design:
 
 collections:
 
     user
-        user_id, email, last_uid, last_update_date
+        user_id, email, last_usage_date
     email
         domain
         address
-        friendly_name
-        full_email
+        name
         uid
         date
+        size
         user_id
 
-        index on user_id
-
-        import "labix.org/v2/mgo"
-
+        index on user_id,uid
 
 go server
 
     update_user
-        read last uid, get all msgs
-        write each to db
-
-    get_user
-        get count by email address with uids
+        get all msgs write each to db
 
 code breakdown
 
@@ -41,3 +36,36 @@ code breakdown
         communicate with mongo
     email
         communicate with imap
+
+API
+    GET /svc/v1/get_emails
+    {
+        "items": [
+            {
+                "key": "brian@wholok.com",
+                "size": 234234,
+                "count": 300,
+                "uids": [4545, 453543,4534543]
+            },
+        ]
+    }
+    
+
+
+    POST /svc/v1/modify_emails
+    input:  {"uids": [1,2,3 . . . ], "action": "archive|delete"}
+    output: {"success": true|false}
+
+
+Crons
+    Delete old emails periodically, when user hasn't accessed API for X time.
+
+UI 
+    Index (check for oauth cookie and reload mails)
+    Get started
+    Gmail login
+    List of sorted by most msgs, filterable, re-sortable
+        Delete button
+        Archive button
+    Sender tab, (Domain tab)
+
