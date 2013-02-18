@@ -153,6 +153,7 @@ func (med *MongoEmailData) GetEmailData(user_id int, group string) {
 
 	for _, item := range result {
 		fmt.Println(item)
+		fmt.Println(item.Value.Count)
 	}
 
 	//return &result, nil
