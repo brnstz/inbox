@@ -7,6 +7,6 @@ web UI to bulk archive/delete these emails.
 
 Depends On
 ==========
-https://github.com/sbinet/go-imap
-http://labix.org/mgo
-http://www.mongodb.org/
+- https://github.com/sbinet/go-imap
+- http://labix.org/mgo
+- http://www.mongodb.org/
