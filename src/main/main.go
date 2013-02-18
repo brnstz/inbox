@@ -42,14 +42,16 @@ func main() {
         server string
         user string
         pw string
+        user_id int
     )
 
     flag.StringVar(&server, "server", "", "IMAP server hostname")
     flag.StringVar(&user, "user", "", "IMAP username")
     flag.StringVar(&pw, "pw", "", "IMAP pw")
+    flag.IntVar(&user_id, "user_id", 0, "mongo user_id")
     flag.Parse()
 
-    e := NewEmail(server, user, pw)
+    e := NewEmail(server, user, pw, user_id)
     //edw := new(TerminalEmailDataWriter)
     edw := NewMongoEmailDataWriter()
     e.GetCounts(1, edw)

@@ -36,7 +36,7 @@ type MongoEmailDataWriter struct {
 }
 
 func (medw *MongoEmailDataWriter) WriteEmailData(ed EmailData) {
-    fmt.Println(ed.Uid)
+    fmt.Println(ed)
     err := medw.email.Insert(&ed)
 
     if err != nil {

@@ -9,10 +9,13 @@ import (
 
 type Email struct {
     conn *imap.Client
+    User_Id int
 }
 
-func NewEmail(server string, user string, pw string) (e *Email) {
+func NewEmail(server string, user string, pw string, user_id int) (e *Email) {
     e = new(Email)
+
+    e.User_Id = user_id
 
     var err error
 
@@ -56,23 +59,22 @@ func (e *Email) ParseFetchResp(resp *imap.Response) (ed EmailData, err error) {
     ed.Uid = resp.MessageInfo().UID
     ed.Date = resp.MessageInfo().InternalDate
     ed.Size = resp.MessageInfo().Size
-    // FIXME
-    ed.User_Id = 1234
+    ed.User_Id = e.User_Id
 
     return ed, nil
 }
 
-func (e *Email) GetCounts(minUid int, edw EmailDataWriter) (err error){
+func (e *Email) getCountsOneLoop(minUid uint32, edw EmailDataWriter) (lastUid uint32, err error) {
     seqSet, err := imap.NewSeqSet(fmt.Sprintf("%d:*", minUid))
 
     if err != nil {
-        return err
+        return 0, err
     }
 
     cmd, err := imap.Wait(e.conn.UIDFetch(seqSet, "ALL"))
 
     if err != nil {
-        return err
+        return 0, err
     }
     for _, resp := range cmd.Data {
         ed, _ := e.ParseFetchResp(resp)
@@ -82,6 +84,26 @@ func (e *Email) GetCounts(minUid int, edw EmailDataWriter) (err error){
             os.Exit(1)
         }
         */
+        lastUid = ed.Uid
+    }
+
+    return lastUid, nil
+}
+
+func (e *Email) GetCounts(minUid uint32, edw EmailDataWriter) (err error) {
+    var lastUid uint32
+    for {
+        lastUid, err = e.getCountsOneLoop(minUid, edw)
+
+        if err != nil {
+            return err
+        }
+
+        if minUid == lastUid {
+            break
+        }
+
+        minUid = lastUid
     }
 
     return nil
