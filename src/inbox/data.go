@@ -40,6 +40,7 @@ type EmailDataWriter interface {
 
 type EmailDataAPI interface {
 	GetEmailData(user_id int, grouping string) *GetEmailResult
+	DeleteOldData(user_id int)
 	//ModifyEmails(user_id int, action string, uids []uint32)
 }
 
@@ -49,6 +50,10 @@ type TerminalEmailDataWriter bool
 // Write EmailData to a terminal
 func (tedw TerminalEmailDataWriter) WriteEmailData(ed EmailData) {
 	fmt.Printf("%s,%s,%s,%d,%s,%d,%d\n", ed.Domain, ed.Address, ed.Name, ed.Uid, ed.Date.Format("2006-01-02"), ed.Size, ed.User_Id)
+}
+
+func (tedw TerminalEmailDataWriter) DeleteOldData(user_id int) {
+	// do nothing
 }
 
 // Write EmailData to MongoDB
@@ -92,7 +97,6 @@ func NewMongoEmailData(mongo_url string, db string) (med *MongoEmailData) {
 
 // Write EmailData to MongoDB
 func (med *MongoEmailData) WriteEmailData(ed EmailData) {
-	fmt.Println(ed)
 	err := med.email.Insert(&ed)
 
 	if err != nil {
@@ -126,8 +130,7 @@ func (med *MongoEmailData) generateMapper(group string) (mapper string, err erro
 	return mapper, err
 }
 
-//func (med *MongoEmailData) GetEmailData(user_id int, group string) (*GetEmailResults, error) {
-func (med *MongoEmailData) GetEmailData(user_id int, group string) {
+func (med *MongoEmailData) GetEmailData(user_id int, group string) (*GetEmailResults, error) {
 
 	// Create a mapper for this grouping
 	mapper, err := med.generateMapper(group)
@@ -151,10 +154,9 @@ func (med *MongoEmailData) GetEmailData(user_id int, group string) {
 
 	med.email.Find(bson.M{"user_id": user_id}).MapReduce(job, &result)
 
-	for _, item := range result {
-		fmt.Println(item)
-		fmt.Println(item.Value.Count)
-	}
+	return &result, nil
+}
 
-	//return &result, nil
+func (med *MongoEmailData) DeleteOldData(user_id int) {
+	med.email.RemoveAll(bson.M{"user_id": user_id})
 }

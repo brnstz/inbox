@@ -1,0 +1,75 @@
+<html>
+
+<head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables_themeroller.css">
+<body>
+
+<script>
+
+var saved_data = {};
+
+function runArchive(rowNum) {
+    post_value = JSON.stringify(saved_data[rowNum]['Value']);
+    $.post("/delete.json", post_value).success(function () {
+        var myrow = $("td").filter(function() {
+            return $(this).text() == saved_data[rowNum]['Id'];
+        }).closest("tr").children();
+        $(myrow[1]).html("0");
+        $(myrow[2]).html("0");
+    });
+}
+
+$(document).ready(function() {
+    $('#emaildata').dataTable({
+       "aoColumns": [
+            { "sType": "string" },
+            { "sType": "numeric" },
+            { "sType": "numeric" },
+            { "sType": "string" },
+        ],
+        "bPaginate": false,
+        "aaSorting": [[ 1, 'desc' ]]
+    } 
+    );
+
+    var loadCounts = function(resp) {
+        var respLength = resp.length;
+        saved_data = resp;
+        for (var i = 0; i < respLength; i++) { 
+            var row = resp[i];
+            $('#emaildata').dataTable().fnAddData([
+                row["Id"], row["Value"]["Count"], row["Value"]["Size"], "<button onClick='javascript:runArchive(" + i + ");' type='button'>Archive</button>"
+            ]);
+        }
+
+    }
+
+    $.ajax({
+        type:       "GET",
+        url:        "/readAddressCounts.json",
+        dataType:   'json',
+        success:    loadCounts,
+    });
+});
+
+</script>
+
+<table id="emaildata" width="100%">
+    <thead>
+        <tr>
+            <th>From</th>
+            <th>Count</th>
+            <th>Byte Count</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+    </tbody>
+</table>
+
+</body>
+</html>

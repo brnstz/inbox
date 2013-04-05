@@ -23,7 +23,7 @@ func NewEmail(server string, user string, pw string, user_id int) (e *Email) {
 		panic(err)
 	}
 
-	_, err = imap.Wait(e.conn.Select("INBOX", true))
+	_, err = imap.Wait(e.conn.Select("INBOX", false))
 	if err != nil {
 		panic(err)
 	}
@@ -98,6 +98,41 @@ func (e *Email) GetCounts(minUid uint32, edw EmailDataWriter) (err error) {
 		}
 
 		minUid = lastUid
+	}
+
+	return nil
+}
+
+func (e *Email) DeleteMany(uids []uint32) (err error) {
+	seqSet := new(imap.SeqSet)
+	for i := 0; i < len(uids); i++ {
+		seqSet.AddNum(uids[i])
+	}
+
+	if err != nil {
+		return err
+	}
+	flags := imap.NewFlagSet(`\Deleted`, `\Seen`)
+
+	cmd, err := imap.Wait(e.conn.UIDStore(seqSet, "+FLAGS", flags))
+	fmt.Println(cmd)
+
+	if err != nil {
+		return err
+	}
+
+	cmd, err = imap.Wait(e.conn.Expunge(nil))
+	fmt.Println(cmd)
+
+	if err != nil {
+		return err
+	}
+
+	cmd, err = imap.Wait(e.conn.Close(true))
+	fmt.Println(cmd)
+
+	if err != nil {
+		return err
 	}
 
 	return nil
