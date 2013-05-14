@@ -26,3 +26,12 @@ Getting Started
 - Take a look at your emails:
     - Go to http://localhost/static/
 - Hit archive button
+
+TODO
+====
+- Create login screen
+- Creating loading overlay
+- Integrate with gmail oauth token
+- Fix simultaneous connections bug
+- Dynamic create user name based on login
+- Save data over time rather than re-creating
