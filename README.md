@@ -33,5 +33,7 @@ TODO
 - Creating loading overlay
 - Integrate with gmail oauth token
 - Fix simultaneous connections bug
+- Make buttons more response
+- Add "friends" list (by default assume emails not junk)
 - Dynamic create user name based on login
 - Save data over time rather than re-creating
