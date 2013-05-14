@@ -14,7 +14,9 @@ Depends On
 
 Getting Started
 ==============
-
+- go get github.com/sbinet/go-imap/go1/imap
+- go get labix.org/v2/mgo
+- go get labix.org/v2/mgo/bson
 - Have a mongod running locally (TODO: make configurable)
 - Edit run.sh and insert your IMAP server, user, and pw.
 - Have port 80 open and know your sudo pw (TODO: make configurable)
